@@ -1,1 +1,2 @@
+PKG_CPPFLAGS=-I"F:/src/github/netcdf-c/include" 
 PKG_LIBS=-lnetcdfdll
