@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <NetcdfInstallPath>F:\src\github\netcdf-c</NetcdfInstallPath>
+    <Hdf5InstallPath>c:\path_to_be_set_manually</Hdf5InstallPath>
+    <RInstallPath>C:\PROGRA~1\R\R-31~1.0</RInstallPath>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup />
+  <ItemGroup>
+    <BuildMacro Include="Hdf5InstallPath">
+      <Value>$(Hdf5InstallPath)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="NetcdfInstallPath">
+      <Value>$(NetcdfInstallPath)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="RInstallPath">
+      <Value>$(RInstallPath)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

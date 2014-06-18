@@ -1,2 +1,7 @@
 PKG_CPPFLAGS=-I"F:/src/github/netcdf-c/include" 
-PKG_LIBS=-lnetcdfdll
+ifeq "$(R_ARCH)" "/x64"
+PKG_LIBS=-lnetcdf -L"F:/src/github/netcdf-c/build/x64/liblib/Debug"
+else
+PKG_LIBS=-lnetcdf -L"F:/src/github/netcdf-c/build/x86/liblib/Debug"
+endif
+

@@ -3,6 +3,7 @@
 #include <netcdf.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h> // needed for fabs, at least if using visual studio.
 
 #include <Rdefines.h>
 
@@ -628,7 +629,7 @@ void R_nc4_put_att_logical( int *ncid, int *varid, char **attname,
 		/* Rprintf( "PUTTING a NA -- float \n" ); */
 		/* Put a NA */
 		if( ttc == NC_FLOAT ) {
-			C_NA_val_f = 0./0.;
+			C_NA_val_f = nan(NULL);
 			*retval = nc_put_att_float(*ncid, *varid, attname[0], 
 				ttc, *natts, &C_NA_val_f );
 			if( *retval != NC_NOERR ) 
@@ -638,7 +639,7 @@ void R_nc4_put_att_logical( int *ncid, int *varid, char **attname,
 
 		else if( ttc == NC_DOUBLE ) {
 			/* Rprintf( "PUTTING a NA -- double \n" ); */
-			C_NA_val_d = 0./0.;
+			C_NA_val_d = nan(NULL);
 			*retval = nc_put_att_double(*ncid, *varid, attname[0], 
 				ttc, *natts, &C_NA_val_d );
 			if( *retval != NC_NOERR ) 
