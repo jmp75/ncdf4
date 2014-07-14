@@ -5,8 +5,11 @@ for both 32/64 bits architectures with Windows operating systems, using the Visu
 
 The CRAN page for the ncdf4 package directs at the time of writing to [a site under maintenance page](http://dwpierce.com/software). 
 The entry point for ncdf4 documentation appears to be [here](http://cirrus.ucsd.edu/~pierce/ncdf/). 
-It is mentioned that one cannot use Visual Studio netcdf libraries because R is build by mingw. 
-However, I am forcing the compilation with Visual Studio instead of Mingw GCC, so the context is different. Be this as it may, I think this is possible to get something going by capitalizing on rClr.
+It is mentioned in [D. Pierce's notes on ncdf4 for Win64](http://cirrus.ucsd.edu/~pierce/ncdf/how_to_build_on_windows.html) that 
+one cannot use netcdf libraries built with Visual Studio because R is build using mingw. I think this means it is at least difficult 
+to compile using the mingw gcc compiler. 
+
+This fork/branch [jmp75/ncdf4 at devel](https://github.com/jmp75/ncdf4/tree/devel) takes a different approach and uses the Visual C++ compiler.
 
 # Building
 
@@ -14,7 +17,7 @@ The source code of the C API of netCDF can be found [in this github repo](https:
 [netCDF with CMake on Windows](http://www.unidata.ucar.edu/software/netcdf/docs/netCDF-CMake.html). One optional requirement, 
 which is used in this documentation, is the HDF5 Libraries for netCDF4/HDF5 support. 
 
-You should also read through [D. Piercs's notes on ncdf4 for Win64](http://cirrus.ucsd.edu/~pierce/ncdf/how_to_build_on_windows.html)
+You should also read through [D. Pierce's notes on ncdf4 for Win64](http://cirrus.ucsd.edu/~pierce/ncdf/how_to_build_on_windows.html)
 
 You need RTools, as appropriate for your version of R, to build the ncdf4 package. The ncdf4 Makefile.win also uses the command `cp` that comes 
 with RTools, so you need its directory in your PATH environment variable.
@@ -76,11 +79,16 @@ This compiles without error the solution, albeit with 700+ warnings however.
 
 # Building ncdf4 C/C++ code with visual studio
 
+To set up the build such that it uses VC++:
 
 ```
 cd F:\src\github_jm\ncdf4\src
 create_lib.cmd
+cp Makefile.win.in Makefile.win
 ```
+
+`create_lib.cmd` creates the file Rdll.lib necessary for VC++ to know what functions are exported by R.dll. Makefile.win overrides the 
+default behavior of R i.e. to look for source files and compile each.
 
 You need to specify two locations in the file src\ncdf4.props, so that the compilation finds the right header and libraries of dependencies. 
 You should use the "short path" format, and must do so for paths with blanks in the directory names.
@@ -90,12 +98,15 @@ You should use the "short path" format, and must do so for paths with blanks in 
 <RInstallPath>C:/PROGRA~1/R/R-31~1.0</RInstallPath>
 ```
 
-You also need to set again NetcdfInstallPath
+You also need to set again NetcdfInstallPath, which is also used outside of the compilation VC++, by Makefile.win, to copy binaries.
 
 ```
 cd F:\src\github_jm
 rm -rf ncdf4.Rcheck
 ```
+
+As of July 2014, you have to install from the source package, not a tarball. 
+This is "just" a question of not having the time to polish the logistical aspects, not a limitation.
 
 ```
 set NetcdfInstallPath=F:/src/github/netcdf-c

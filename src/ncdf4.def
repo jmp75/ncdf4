@@ -9,9 +9,6 @@ R_nc4_varsize
 R_nc4_inq_vartype 
 R_nc4_inq_varndims 
 R_nc4_inq_varid 
-R_nc4_get_vara_int 
-R_nc4_get_vara_double_fixmiss 
-R_nc4_get_vara_double 
 R_nc4_get_vara_text 
 R_nc4_def_var_deflate 
 R_nc4_inq_var_deflate 
@@ -33,8 +30,6 @@ R_nc4_enddef
 R_nc4_sync
 R_nc4_redef
 R_nc4_close
-R_nc4_put_vara_int 
-R_nc4_put_vara_double 
 R_nc4_put_vara_text 
 R_nc4_rename_var 
 R_nc4_put_att_int

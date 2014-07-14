@@ -47,3 +47,4 @@ SET_VECTOR_ELT
 Rf_isInteger
 R_ExpandFileName
 R_alloc
+R_IsNA
