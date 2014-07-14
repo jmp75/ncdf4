@@ -15,6 +15,7 @@
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
+
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -85,30 +86,30 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath);$(VCInstallDir)atlmfc\include;$(RInstallPath)\include;$(NetcdfInstallPath)\include</IncludePath>
-    <LibraryPath>$(LibraryPath);$(VSInstallDir);$(VSInstallDir)lib;.\libfiles\i386;$(RInstallPath)\bin\i386;$(NetcdfInstallPath)\build\x86\liblib\Debug</LibraryPath>
-    <ReferencePath>.\libfiles\i386;$(RInstallPath)\bin\i386;$(NetcdfInstallPath)\build\x86\liblib\Debug</ReferencePath>
+    <IncludePath>$(IncludePath);$(VCInstallDir)atlmfc/include;$(RInstallPath)/include;$(NetcdfInstallPath)/include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(VSInstallDir);$(VSInstallDir)lib;./libfiles/i386;$(RInstallPath)/bin/i386;$(NetcdfInstallPath)/build/x86/liblib/Debug</LibraryPath>
+    <ReferencePath>./libfiles/i386;$(RInstallPath)/bin/i386;$(NetcdfInstallPath)/build/x86/liblib/Debug</ReferencePath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath);$(VCInstallDir)atlmfc\include;$(RInstallPath)\include;$(NetcdfInstallPath)\include</IncludePath>
-    <LibraryPath>$(LibraryPath);$(VSInstallDir);$(VSInstallDir)lib;.\libfiles\x64;$(RInstallPath)\bin\x64;$(NetcdfInstallPath)\build\x64\liblib\Debug</LibraryPath>
-    <ReferencePath>.\libfiles\x64;$(RInstallPath)\bin\x64;$(NetcdfInstallPath)\build\x64\liblib\Debug</ReferencePath>
+    <IncludePath>$(IncludePath);$(VCInstallDir)atlmfc/include;$(RInstallPath)/include;$(NetcdfInstallPath)/include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(VSInstallDir);$(VSInstallDir)lib;./libfiles/x64;$(RInstallPath)/bin/x64;$(NetcdfInstallPath)/build/x64/liblib/Debug</LibraryPath>
+    <ReferencePath>./libfiles/x64;$(RInstallPath)/bin/x64;$(NetcdfInstallPath)/build/x64/liblib/Debug</ReferencePath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath);$(VCInstallDir)atlmfc\include;$(RInstallPath)\include;$(NetcdfInstallPath)\include</IncludePath>
-    <LibraryPath>$(LibraryPath);$(VSInstallDir);$(VSInstallDir)lib;.\libfiles\i386;$(RInstallPath)\bin\i386;$(NetcdfInstallPath)\build\x86\liblib\Debug</LibraryPath>
-    <ReferencePath>.\libfiles\i386;$(RInstallPath)\bin\i386;$(NetcdfInstallPath)\build\x86\liblib\Debug</ReferencePath>
+    <IncludePath>$(IncludePath);$(VCInstallDir)atlmfc/include;$(RInstallPath)/include;$(NetcdfInstallPath)/include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(VSInstallDir);$(VSInstallDir)lib;./libfiles/i386;$(RInstallPath)/bin/i386;$(NetcdfInstallPath)/build/x86/liblib/Debug</LibraryPath>
+    <ReferencePath>./libfiles/i386;$(RInstallPath)/bin/i386;$(NetcdfInstallPath)/build/x86/liblib/Debug</ReferencePath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(IncludePath);$(VCInstallDir)atlmfc\include;$(RInstallPath)\include;$(NetcdfInstallPath)\include</IncludePath>
-    <LibraryPath>$(LibraryPath);$(VSInstallDir);$(VSInstallDir)lib;.\libfiles\x64;$(RInstallPath)\bin\x64;$(NetcdfInstallPath)\build\x64\liblib\Debug</LibraryPath>
-    <ReferencePath>.\libfiles\x64;$(RInstallPath)\bin\x64;$(NetcdfInstallPath)\build\x64\liblib\Debug</ReferencePath>
+    <IncludePath>$(IncludePath);$(VCInstallDir)atlmfc/include;$(RInstallPath)/include;$(NetcdfInstallPath)/include</IncludePath>
+    <LibraryPath>$(LibraryPath);$(VSInstallDir);$(VSInstallDir)lib;./libfiles/x64;$(RInstallPath)/bin/x64;$(NetcdfInstallPath)/build/x64/liblib/Debug</LibraryPath>
+    <ReferencePath>./libfiles/x64;$(RInstallPath)/bin/x64;$(NetcdfInstallPath)/build/x64/liblib/Debug</ReferencePath>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
