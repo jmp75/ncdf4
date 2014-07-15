@@ -119,6 +119,23 @@ set R="c:\Program Files\R\R-3.1.0\bin\x64\R.exe"
 
 Noticed that running one of the examples worked on 32 bits but same thing failed on 64 bits. Compiled with Visual studio then, to have a debuggable ncdf4.dll; surprise it then all works.
 
+If you are using the `devtools` package in R:
+
+```R
+library(devtools)
+Sys.setenv(NetcdfInstallPath='F:/src/github/netcdf-c', Hdf5InstallPath='F:/bin/HDF5')
+document('f:/src/github_jm/ncdf4', roclets = c("collate")) # leave "namespace" out.
+build('f:/src/github_jm/ncdf4')
+```
+
+```
+cd F:\src\github_jm
+set NetcdfInstallPath=F:/src/github/netcdf-c
+set Hdf5InstallPath=F:/bin/HDF5
+set R="c:\Program Files\R\R-3.1.0\bin\x64\R.exe"
+%R% CMD INSTALL ncdf4_1.12-1.tar.gz
+```
+
 # Log Notes
 
 For the record, where I started from using David Pierce's work
