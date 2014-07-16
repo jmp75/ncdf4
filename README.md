@@ -124,7 +124,7 @@ If you are using the `devtools` package in R:
 ```R
 library(devtools)
 Sys.setenv(NetcdfInstallPath='F:/src/github/netcdf-c', Hdf5InstallPath='F:/bin/HDF5')
-document('f:/src/github_jm/ncdf4', roclets = c("collate")) # leave "namespace" out.
+document('f:/src/github_jm/ncdf4', roclets = c("collate", "rd")) # leave "namespace" and "rd" out of the roclets options.
 build('f:/src/github_jm/ncdf4')
 ```
 
@@ -135,6 +135,8 @@ set Hdf5InstallPath=F:/bin/HDF5
 set R="c:\Program Files\R\R-3.1.0\bin\x64\R.exe"
 %R% CMD INSTALL ncdf4_1.12-1.tar.gz
 ```
+
+
 
 # Log Notes
 

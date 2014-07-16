@@ -48,3 +48,9 @@ R_nc4_inq
 R_nc4_inq_dimids
 R_nc4_def_grp
 R_nc4_grpname
+Rsx_nc4_get_vara_int
+Rsx_nc4_get_vara_double
+Rsx_nc4_put_vara_int
+Rsx_nc4_put_vara_double
+R_nc4_set_NA_to_val_double
+
