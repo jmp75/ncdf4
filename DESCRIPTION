@@ -27,3 +27,4 @@ License: GPL (>= 3)
 URL: http://dwpierce.com/software
 Packaged: 2014-07-15 01:29:21 UTC; per202
 NeedsCompilation: yes
+Archs: i386, x64

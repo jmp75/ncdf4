@@ -1,0 +1,80 @@
+# Emacs please make this -*- mode: makefile; tab-width: 8 -*-
+#
+# makefile specific for compilation on Windows, using the Visual CPP compiler.
+ifeq "$(BuildConfiguration)" ""
+BuildConfiguration:=Release
+endif
+
+SLN:= ncdf4.sln
+
+ifeq "$(MSB)" ""
+MSB:=C:/PROGRA~2/MSBuild/12.0/Bin/amd64/MSBuild.exe
+endif
+
+INSTDIR:= ../inst
+
+# MODE:=Rebuild
+MODE:=Build
+
+# This can be helpful to diagnose the msbuild procedure
+# DEBUG_BUILD_CMD=/v:diag
+DEBUG_BUILD_CMD=
+
+MSB_OPTIONS_EXTRA=$(DEBUG_BUILD_CMD)
+ifneq "$(VS120COMNTOOLS)" ""
+# work around issue with VS2013, see https://rclr.codeplex.com/workitem/9
+MSB_OPTIONS_EXTRA=$(DEBUG_BUILD_CMD) /p:VisualStudioVersion=12.0
+endif
+
+FNAME:=ncdf4
+
+# IMPORTANT: The option -u and -p are not a gratuitous fancy. For some odd reasons the 
+# files under /libs/ are copied with access rights such that they fail to load with dyn.load 
+# and R CMD check would fail with a misleading error message about not being a valid Win32 application.
+# CP_CMD:=cp -u -p
+CP_CMD:=cp -f
+
+all: winarch ncdf4lib 
+
+winarch:
+	# -@echo Windows architecture "$(R_ARCH)"
+	-@echo Build configuration "$(BuildConfiguration)"
+	-@echo netCDF C library location: "$(NetcdfInstallPath)"
+	-@echo HDF5 library location: "$(Hdf5InstallPath)"
+
+ncdf4libComp: ncdf3.c ncdf2.c ncdf.c src_ncdf4.c
+	@for tgt_platform in x64 Win32; do \
+		$(MSB) $(SLN) /t:$(MODE) /p:Configuration=$(BuildConfiguration) /p:Platform="$$tgt_platform" $(MSB_OPTIONS_EXTRA); \
+	done;
+
+instdir:
+	@for r_architecture in x64 i386; do \
+		rm -rf $(INSTDIR)/libs/$$r_architecture ; \
+		mkdir -p $(INSTDIR) 2>/dev/null ; \
+		mkdir -p $(INSTDIR)/libs/$$r_architecture 2>/dev/null ; \
+	done;
+
+ncdf4lib: ncdf4libComp instdir
+	r_architecture=x64;\
+	NCDF4_BIN_DIR=./x64/$(BuildConfiguration);\
+	bin_dir=$$NCDF4_BIN_DIR; \
+	NCDF4_BINS="$$bin_dir/$(FNAME).dll $$bin_dir/$(FNAME).exp $$bin_dir/$(FNAME).lib $$bin_dir/$(FNAME).pdb" ; \
+	$(CP_CMD) $$NCDF4_BINS $(INSTDIR)/libs/$$r_architecture/ ; \
+	$(CP_CMD) $(NetcdfInstallPath)/build/x64/liblib/$(BuildConfiguration)/netcdf.* $(INSTDIR)/libs/$$r_architecture/ ; \
+	$(CP_CMD) $(Hdf5InstallPath)/x64/bin/*.dll $(INSTDIR)/libs/$$r_architecture/ ;
+	r_architecture=i386;\
+	NCDF4_BIN_DIR=./$(BuildConfiguration);\
+	bin_dir=$$NCDF4_BIN_DIR; \
+	NCDF4_BINS="$$bin_dir/$(FNAME).dll $$bin_dir/$(FNAME).exp $$bin_dir/$(FNAME).lib $$bin_dir/$(FNAME).pdb" ; \
+	$(CP_CMD) $$NCDF4_BINS $(INSTDIR)/libs/$$r_architecture/ ; \
+	$(CP_CMD) $(NetcdfInstallPath)/build/x86/liblib/$(BuildConfiguration)/netcdf.* $(INSTDIR)/libs/$$r_architecture/ ; \
+	$(CP_CMD) $(Hdf5InstallPath)/x86/bin/*.dll $(INSTDIR)/libs/$$r_architecture/ ;
+	
+
+clean: 
+	$(MSB) $(SLN) /t:Clean
+
+distclean: clean
+	-rm -rf $(INSTDIR)
+
+.PHONY: all
