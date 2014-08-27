@@ -53,28 +53,57 @@ Note that the options arguments to the `-G` option of cmake are not obvious, and
 I think I figured out by looking through the netCDF mailing lists.
 
 ```cmd
-:: F:\src\github\netcdf-c
+:: Change drive and directory:e.g. 
+:: F:
+:: cd F:\src\github\netcdf-c
+
 :: set BuildConfiguration=Debug
 set BuildConfiguration=Release
+set HDF5_BIN_DIR=f:/bin/HDF5
+
+:: We need to specify upfront the potential installation directory, to override the default "c:/program files/netCDF"
+set INSTALL_DIR=f:/bin/netcdf/devel
+set INSTALL_DIR_DOS=f:\bin\netcdf\devel\
+mkdir %INSTALL_DIR_DOS%x64
+mkdir %INSTALL_DIR_DOS%x86
+
+
+:: I could not use the msbuild coming with the .NET FW itself, otherwise it will try the v11 compiler on v12 (VS2013) projects. 
+:: This warning may however not apply to your machine.
+:: set MSB=C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe
+:: Note that the same msbuild seems possible to use irrespective of 32/64 bits, so no need to define architecture-specific ones.
+set MSB="C:\Program Files (x86)\MSBuild\12.0\Bin\amd64\MSBuild.exe"
+
+
 mkdir build
 cd build
 mkdir x64
 cd x64
-set HDF5_BIN_DIR=f:/bin/HDF5
-cmake ..\.. -L -DHDF5_DIR=%HDF5_BIN_DIR%/x64/cmake/hdf5 -DZLIB_LIBRARY=F:/bin/HDF5/x64/lib/zlib.lib  -DENABLE_DAP=OFF -DHDF5_HL_LIB=%HDF5_BIN_DIR%/x64/lib/hdf5_hl.lib -DHDF5_LIB=%HDF5_BIN_DIR%/x64/lib/hdf5.lib -DHDF5_INCLUDE_DIR=%HDF5_BIN_DIR%/x64/include/ -DZLIB_INCLUDE_DIR=%HDF5_BIN_DIR%/x64/include/ -G"Visual Studio 12 Win64" >  cmakeoutlog.txt 2>&1
-:: Do NOT use the following msbuild, otherwise it will try the v11 compiler on v12 (VS2013) projects.
-:: set MSB=C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe
-:: Same msbuild seems possible to use irrespective of 32/64 bits.
-set MSB="C:\Program Files (x86)\MSBuild\12.0\Bin\amd64\MSBuild.exe"
-%MSB% netCDF.sln /p:Configuration=%BuildConfiguration% /p:Platform=x64 > buildoutlog.txt 2>&1
+
+cmake ..\.. -LA -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%/x64/ -DCMAKE_BUILD_TYPE:STRING=%BuildConfiguration% -DHDF5_DIR:PATH=%HDF5_BIN_DIR%/x64/cmake/hdf5 -DZLIB_LIBRARY=F:/bin/HDF5/x64/lib/zlib.lib  -DENABLE_DAP=OFF -DHDF5_HL_LIB:FILEPATH=%HDF5_BIN_DIR%/x64/lib/hdf5_hl.lib -DHDF5_LIB:FILEPATH=%HDF5_BIN_DIR%/x64/lib/hdf5.lib -DHDF5_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/x64/include/ -DZLIB_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/x64/include/ -G"Visual Studio 12 Win64" >  cmakeoutlog.txt 2>&1
+
+cmake --build . > buildoutlog.txt 2>&1
+:: %MSB% netCDF.sln /p:Configuration=%BuildConfiguration% /p:Platform=x64 > buildoutlog.txt 2>&1
+
 cd ..
 mkdir x86
 cd x86
-cmake ..\.. -L -DHDF5_DIR=%HDF5_BIN_DIR%/x86/cmake/hdf5 -DZLIB_LIBRARY=F:/bin/HDF5/x86/lib/zlib.lib  -DENABLE_DAP=OFF -DHDF5_HL_LIB=%HDF5_BIN_DIR%/x86/lib/hdf5_hl.lib -DHDF5_LIB=%HDF5_BIN_DIR%/x86/lib/hdf5.lib -DHDF5_INCLUDE_DIR=%HDF5_BIN_DIR%/x86/include/ -DZLIB_INCLUDE_DIR=%HDF5_BIN_DIR%/x86/include/ -G"Visual Studio 12" >  cmakeoutlog.txt 2>&1
+cmake ..\.. -LA -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%/x86/ -DCMAKE_BUILD_TYPE:STRING=%BuildConfiguration% -DHDF5_DIR:PATH=%HDF5_BIN_DIR%/x86/cmake/hdf5 -DZLIB_LIBRARY=F:/bin/HDF5/x86/lib/zlib.lib  -DENABLE_DAP=OFF -DHDF5_HL_LIB:FILEPATH=%HDF5_BIN_DIR%/x86/lib/hdf5_hl.lib -DHDF5_LIB:FILEPATH=%HDF5_BIN_DIR%/x86/lib/hdf5.lib -DHDF5_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/x86/include/ -DZLIB_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/x86/include/ -G"Visual Studio 12" >  cmakeoutlog.txt 2>&1
 %MSB% netCDF.sln /p:Configuration=%BuildConfiguration% /p:Platform=Win32 > buildoutlog.txt 2>&1
 ```
 
 This compiles without error the solution, albeit with 700+ warnings however.
+
+To install 
+
+```cmd
+cd build
+cd x64
+
+cmake --build . --target install > cmakebuildllog.txt 2>&1
+
+```
+
 
 
 # Building ncdf4 C/C++ code with visual studio
