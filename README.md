@@ -81,10 +81,22 @@ mkdir x64
 cd x64
 
 cmake ..\.. -LA -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%/x64/ -DCMAKE_BUILD_TYPE:STRING=%BuildConfiguration% -DHDF5_DIR:PATH=%HDF5_BIN_DIR%/x64/cmake/hdf5 -DZLIB_LIBRARY=F:/bin/HDF5/x64/lib/zlib.lib  -DENABLE_DAP=OFF -DHDF5_HL_LIB:FILEPATH=%HDF5_BIN_DIR%/x64/lib/hdf5_hl.lib -DHDF5_LIB:FILEPATH=%HDF5_BIN_DIR%/x64/lib/hdf5.lib -DHDF5_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/x64/include/ -DZLIB_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/x64/include/ -G"Visual Studio 12 Win64" >  cmakeoutlog.txt 2>&1
+```
 
+Normally at this point, I should be able to use the following cmake command. However, even if I have set CMAKE_BUILD_TYPE to be 'Release', the build then seems to be for the default profile, i.e. 'Debug'. 
+
+```cmd
 cmake --build . > buildoutlog.txt 2>&1
-:: %MSB% netCDF.sln /p:Configuration=%BuildConfiguration% /p:Platform=x64 > buildoutlog.txt 2>&1
+```
 
+So, I need to do the following instead.
+```cmd
+%MSB% netCDF.sln /p:Configuration=%BuildConfiguration% /p:Platform=x64 > buildoutlog.txt 2>&1
+```
+
+This compiles without error the solution, albeit with 700+ warnings however.
+
+```cmd
 cd ..
 mkdir x86
 cd x86
@@ -92,9 +104,7 @@ cmake ..\.. -LA -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%/x86/ -DCMAKE_BUILD_TYPE:STR
 %MSB% netCDF.sln /p:Configuration=%BuildConfiguration% /p:Platform=Win32 > buildoutlog.txt 2>&1
 ```
 
-This compiles without error the solution, albeit with 700+ warnings however.
-
-To install 
+To install, the following should be done, however I am not sure this picks the right profile specified, so using a more manual or custom process to copy/paste files is needed. Also, the 'install' target did not produce a directory tree as fully populated as what I can see from the official netCDF binaries distribution (hdf5.dll, .lib files for instance)
 
 ```cmd
 cd build
@@ -103,7 +113,6 @@ cd x64
 cmake --build . --target install > cmakebuildllog.txt 2>&1
 
 ```
-
 
 
 # Building ncdf4 C/C++ code with visual studio
