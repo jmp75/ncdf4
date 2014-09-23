@@ -48,3 +48,14 @@ Rf_isInteger
 R_ExpandFileName
 R_alloc
 R_IsNA
+SET_NAMED 
+Rf_translateChar 
+R_DimNamesSymbol 
+Rf_install 
+Rf_isString 
+Rf_classgets 
+Rf_dimgets 
+Rf_namesgets 
+Rf_dimnamesgets 
+R_BadLongVector
+

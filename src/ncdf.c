@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <math.h> // needed for fabs, at least if using visual studio.
 
+#define USE_RINTERNALS // https://github.com/jmp75/ncdf4/issues/1
+
 #include <Rdefines.h>
 
 /* These same values are hard-coded into the R source. Don't change them! 
@@ -198,6 +200,43 @@ void R_nc4_inq_varndims( int *ncid, int *varid, int *ndims, int *retval )
 			nc_strerror(*retval) );
 }
 
+/* A copy of setAttrib, to diagnose https://github.com/jmp75/ncdf4/issues/1 */
+SEXP ncdfSetAttrib( SEXP vec, SEXP name, SEXP val )
+{
+	// Fall back on setAttrib by default
+	if (name != R_NamesSymbol && name != R_DimSymbol)
+		return setAttrib( vec, name, val );
+
+	PROTECT( vec );
+	PROTECT( name );
+
+	// Somehow calling isString on R_NamesSymbol fails on 64 bits. Odd, odd, odd.
+	//if (isString(name))
+	//	name = install(translateChar(STRING_ELT(name, 0)));
+	if (val == R_NilValue) {
+		UNPROTECT( 2 );
+		Rf_error( "ncdfSetAttrib: attribute value cannot be the R NilValue" );
+	}
+
+	/* We allow attempting to remove names from NULL */
+	//if (vec == R_NilValue)
+	//	error(_("attempt to set an attribute on NULL"));
+
+	if (NAMED( val )) val = duplicate( val );
+	SET_NAMED( val, NAMED( val ) | NAMED( vec ) );
+	UNPROTECT( 2 );
+
+	if (name == R_NamesSymbol)
+		return namesgets( vec, val );
+	else if (name == R_DimSymbol)
+		return dimgets( vec, val );
+	else
+	{
+		return R_NilValue;
+	}
+}
+
+
 /*********************************************************************/
 /* Inputs:
  *	sx_fixmiss  : is 1 if we want to fix the missing values in this
@@ -224,11 +263,8 @@ SEXP Rsx_nc4_get_vara_double( SEXP sx_ncid, SEXP sx_varid, SEXP sx_start, SEXP s
 	PROTECT( sx_retval = allocVector( VECSXP, 2 ));	/* 2 elements in returned list */
 
 	/* Set names for the returned list */
-	PROTECT( sx_retnames = allocVector( STRSXP, 2 ));
-	SET_STRING_ELT( sx_retnames, 0, mkChar("error") );
-	SET_STRING_ELT( sx_retnames, 1, mkChar("data" ) );
-	setAttrib( sx_retval, R_NamesSymbol, sx_retnames );
-	UNPROTECT(1);     				/* done with sx_retnames */
+	sx_retnames = create_sx_retnames();
+	ncdfSetAttrib( sx_retval, R_NamesSymbol, sx_retnames );
 
 	/* Set provisional 'no error' retval */
 	PROTECT(sx_reterr = allocVector( INTSXP, 1 ));
@@ -337,6 +373,24 @@ SEXP Rsx_nc4_get_vara_double( SEXP sx_ncid, SEXP sx_varid, SEXP sx_start, SEXP s
 	return( sx_retval );
 }
 
+
+SEXP make_char_sexp(int n, char ** values) {
+	SEXP result;
+	long i = 0;
+	PROTECT(result = NEW_CHARACTER(n));
+	for (i = 0; i < n; i++) {
+		SET_STRING_ELT(result, i, mkChar((const char*)values[i]));
+	}
+	UNPROTECT(1);
+	return result;
+}
+
+SEXP create_sx_retnames() {
+	char * ret_names[2] = { "error", "data" };
+	return make_char_sexp( 2, ret_names );
+}
+
+
 /*********************************************************************/
 /* Input value byte_style is 1 for signed, 2 for unsigned
  * 
@@ -359,11 +413,8 @@ SEXP Rsx_nc4_get_vara_int( SEXP sx_ncid, SEXP sx_varid, SEXP sx_start,
 	PROTECT( sx_retval = allocVector( VECSXP, 2 ));	/* 2 elements in returned list */
 
 	/* Set names for the returned list */
-	PROTECT( sx_retnames = allocVector( STRSXP, 2 ));
-	SET_STRING_ELT( sx_retnames, 0, mkChar("error") );
-	SET_STRING_ELT( sx_retnames, 1, mkChar("data" ) );
-	setAttrib( sx_retval, R_NamesSymbol, sx_retnames );
-	UNPROTECT(1);     				/* done with sx_retnames */
+	sx_retnames = create_sx_retnames();
+	ncdfSetAttrib(sx_retval, R_NamesSymbol, sx_retnames);
 
 	/* Set provisional 'no error' retval */
 	PROTECT(sx_reterr = allocVector( INTSXP, 1 ));

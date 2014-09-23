@@ -406,7 +406,7 @@ SEXP R_nc4_get_vara_numvarid( SEXP sx_nc, SEXP sx_varid, SEXP sx_start, SEXP sx_
 				j++;
 				}
 		}
-	setAttrib( rv_data, R_DimSymbol, sx_dim );
+	ncdfSetAttrib( rv_data, R_DimSymbol, sx_dim );
 
 	UNPROTECT(2);
 	return(rv_data);
@@ -517,11 +517,8 @@ SEXP R_nc4_get_vara_string( SEXP sx_nc, SEXP sx_varid, SEXP sx_start, SEXP sx_co
 	PROTECT( sx_retval   = allocVector( VECSXP, 2 ));       /* 2 elements in the returned list: $error, $strings */
 
 	/* Set the names for the returned list */
-	PROTECT( sx_retnames = allocVector( STRSXP, 2 ));       /* 2 elements in the returned list */
-	SET_STRING_ELT( sx_retnames, 0, mkChar("error") );
-	SET_STRING_ELT( sx_retnames, 1, mkChar("data") );
-	setAttrib( sx_retval, R_NamesSymbol, sx_retnames );
-	UNPROTECT(1); 
+	sx_retnames = create_sx_retnames();
+	ncdfSetAttrib( sx_retval, R_NamesSymbol, sx_retnames );
 
 	/* Set the return error code */
 	PROTECT( sx_reterror = allocVector( INTSXP, 1 ));

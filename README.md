@@ -45,7 +45,7 @@ Placeholder; not documented yet.
 
 Once you have installed or compiled HDF5, you can compile netcdf-c with HDF5 support enabled.
 
-Clone the git [netcdf-c repo](https://github.com/Unidata/netcdf-c)
+Clone the git [netcdf-c repo](https://github.com/Unidata/netcdf-c) or the appropriate fork, for instance [this one](https://github.com/jmp75/netcdf-c)
 
 Other options than HDF5 and ZLIB mentioned in [netCDF with CMake on Windows](http://www.unidata.ucar.edu/software/netcdf/docs/netCDF-CMake.html) are set to OFF.
 
@@ -54,16 +54,23 @@ I think I figured out by looking through the netCDF mailing lists.
 
 ```cmd
 :: Change drive and directory:e.g. 
-:: F:
-:: cd F:\src\github\netcdf-c
 
-:: set BuildConfiguration=Debug
-set BuildConfiguration=Release
+F:
+set SRC_DIR_DOS=F:\src\github_jm\netcdf-c\
+cd %SRC_DIR_DOS%
+
+set BuildConfiguration=Debug
+:: set BuildConfiguration=Release
 set HDF5_BIN_DIR=f:/bin/HDF5
+set HDF5_BIN_DIR_DOS=f:\bin\HDF5\
 
 :: We need to specify upfront the potential installation directory, to override the default "c:/program files/netCDF"
 set INSTALL_DIR=f:/bin/netcdf/devel
 set INSTALL_DIR_DOS=f:\bin\netcdf\devel\
+
+set CMAKE_BUILD_DIR=build
+set BUILD_DIR=%SRC_DIR_DOS%%CMAKE_BUILD_DIR%\
+
 mkdir %INSTALL_DIR_DOS%x64
 mkdir %INSTALL_DIR_DOS%x86
 
@@ -75,12 +82,12 @@ mkdir %INSTALL_DIR_DOS%x86
 set MSB="C:\Program Files (x86)\MSBuild\12.0\Bin\amd64\MSBuild.exe"
 
 
-mkdir build
-cd build
-mkdir x64
-cd x64
-
-cmake ..\.. -LA -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%/x64/ -DCMAKE_BUILD_TYPE:STRING=%BuildConfiguration% -DHDF5_DIR:PATH=%HDF5_BIN_DIR%/x64/cmake/hdf5 -DZLIB_LIBRARY=F:/bin/HDF5/x64/lib/zlib.lib  -DENABLE_DAP=OFF -DHDF5_HL_LIB:FILEPATH=%HDF5_BIN_DIR%/x64/lib/hdf5_hl.lib -DHDF5_LIB:FILEPATH=%HDF5_BIN_DIR%/x64/lib/hdf5.lib -DHDF5_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/x64/include/ -DZLIB_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/x64/include/ -G"Visual Studio 12 Win64" >  cmakeoutlog.txt 2>&1
+mkdir %CMAKE_BUILD_DIR%
+cd %BUILD_DIR%
+set CPU_ARCH=x64
+mkdir %CPU_ARCH%
+cd %CPU_ARCH%
+cmake ..\.. -LA -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%/%CPU_ARCH%/ -DCMAKE_BUILD_TYPE:STRING=%BuildConfiguration% -DHDF5_DIR:PATH=%HDF5_BIN_DIR%/%CPU_ARCH%/cmake/hdf5 -DZLIB_LIBRARY=F:/bin/HDF5/%CPU_ARCH%/lib/zlib.lib  -DENABLE_DAP=OFF -DHDF5_HL_LIB:FILEPATH=%HDF5_BIN_DIR%/%CPU_ARCH%/lib/hdf5_hl.lib -DHDF5_LIB:FILEPATH=%HDF5_BIN_DIR%/%CPU_ARCH%/lib/hdf5.lib -DHDF5_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/%CPU_ARCH%/include/ -DZLIB_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/%CPU_ARCH%/include/ -G"Visual Studio 12 Win64" >  cmakeoutlog.txt 2>&1
 ```
 
 Normally at this point, I should be able to use the following cmake command. However, even if I have set CMAKE_BUILD_TYPE to be 'Release', the build then seems to be for the default profile, i.e. 'Debug'. 
@@ -90,32 +97,56 @@ cmake --build . > buildoutlog.txt 2>&1
 ```
 
 So, I need to do the following instead.
+
 ```cmd
-%MSB% netCDF.sln /p:Configuration=%BuildConfiguration% /p:Platform=x64 > buildoutlog.txt 2>&1
+%MSB% netCDF.sln /p:Configuration=%BuildConfiguration% /p:Platform=%CPU_ARCH% > buildoutlog.txt 2>&1
 ```
 
 This compiles without error the solution, albeit with 700+ warnings however.
 
 ```cmd
+set CPU_ARCH=x86
 cd ..
-mkdir x86
-cd x86
-cmake ..\.. -LA -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%/x86/ -DCMAKE_BUILD_TYPE:STRING=%BuildConfiguration% -DHDF5_DIR:PATH=%HDF5_BIN_DIR%/x86/cmake/hdf5 -DZLIB_LIBRARY=F:/bin/HDF5/x86/lib/zlib.lib  -DENABLE_DAP=OFF -DHDF5_HL_LIB:FILEPATH=%HDF5_BIN_DIR%/x86/lib/hdf5_hl.lib -DHDF5_LIB:FILEPATH=%HDF5_BIN_DIR%/x86/lib/hdf5.lib -DHDF5_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/x86/include/ -DZLIB_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/x86/include/ -G"Visual Studio 12" >  cmakeoutlog.txt 2>&1
+mkdir %CPU_ARCH%
+cd %CPU_ARCH%
+cmake ..\.. -LA -DCMAKE_INSTALL_PREFIX=%INSTALL_DIR%/%CPU_ARCH%/ -DCMAKE_BUILD_TYPE:STRING=%BuildConfiguration% -DHDF5_DIR:PATH=%HDF5_BIN_DIR%/%CPU_ARCH%/cmake/hdf5 -DZLIB_LIBRARY=F:/bin/HDF5/%CPU_ARCH%/lib/zlib.lib  -DENABLE_DAP=OFF -DHDF5_HL_LIB:FILEPATH=%HDF5_BIN_DIR%/%CPU_ARCH%/lib/hdf5_hl.lib -DHDF5_LIB:FILEPATH=%HDF5_BIN_DIR%/%CPU_ARCH%/lib/hdf5.lib -DHDF5_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/%CPU_ARCH%/include/ -DZLIB_INCLUDE_DIR:PATH=%HDF5_BIN_DIR%/%CPU_ARCH%/include/ -G"Visual Studio 12" >  cmakeoutlog.txt 2>&1
 %MSB% netCDF.sln /p:Configuration=%BuildConfiguration% /p:Platform=Win32 > buildoutlog.txt 2>&1
 ```
 
-To install, the following should be done, however I am not sure this picks the right profile specified, so using a more manual or custom process to copy/paste files is needed. Also, the 'install' target did not produce a directory tree as fully populated as what I can see from the official netCDF binaries distribution (hdf5.dll, .lib files for instance)
+To install, the following should be done, however I am not fully sure this picks the right profile specified. Also, the 'install' 
+target did not produce a directory tree as fully populated as what I can see from the official netCDF binaries distribution (hdf5.dll, .lib files for instance)
 
 ```cmd
-cd build
-cd x64
-
+set CPU_ARCH=x64
+cd %BUILD_DIR%%CPU_ARCH%
 cmake --build . --target install > cmakebuildllog.txt 2>&1
+set CPU_ARCH=x86
+cd %BUILD_DIR%%CPU_ARCH%
+cmake --build . --target install > cmakebuildllog.txt 2>&1
+```
 
+So a few steps are required to copy enough to have something that resembles the official distributions.
+
+```cmd
+set CP_CMD=xcopy /Y
+
+set CPU_ARCH=x64
+
+%CP_CMD% %BUILD_DIR%%CPU_ARCH%\liblib\%BuildConfiguration%\netcdf.pdb %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
+%CP_CMD% %BUILD_DIR%%CPU_ARCH%\liblib\%BuildConfiguration%\netcdf.lib %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
+%CP_CMD% %HDF5_BIN_DIR_DOS%%CPU_ARCH%\bin\*.* %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
+
+set CPU_ARCH=x86
+
+%CP_CMD% %BUILD_DIR%%CPU_ARCH%\liblib\%BuildConfiguration%\netcdf.pdb %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
+%CP_CMD% %BUILD_DIR%%CPU_ARCH%\liblib\%BuildConfiguration%\netcdf.lib %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
+%CP_CMD% %HDF5_BIN_DIR_DOS%%CPU_ARCH%\bin\*.* %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
 ```
 
 
 # Building ncdf4 C/C++ code with visual studio
+
+In order to build R packages on Windows, you need to install [RTools](http://cran.csiro.au/bin/windows/Rtools/). While GCC is not needed in our case, since we use VC++, other tools are required and/or otherwise handy.
 
 To set up the build such that it uses VC++:
 
@@ -129,30 +160,35 @@ cp Makefile.win.in Makefile.win
 default behavior of R i.e. to look for source files and compile each.
 
 You need to specify two locations in the file src\ncdf4.props, so that the compilation finds the right header and libraries of dependencies. 
-You should use the "short path" format, and must do so for paths with blanks in the directory names.
+You should use the "short path" format, at least do so for paths otherwise with blanks in the directory names.
 
 ```xml
-<NetcdfInstallPath>F:/src/github/netcdf-c</NetcdfInstallPath>
+<NetcdfInstallPath>F:/src/github_jm/netcdf-c</NetcdfInstallPath>
 <RInstallPath>C:/PROGRA~1/R/R-31~1.0</RInstallPath>
 ```
 
-You also need to set again NetcdfInstallPath, which is also used outside of the compilation VC++, by Makefile.win, to copy binaries.
+As of July 2014, you have to install from the source package, not a tarball. 
+This is "just" a question of not having the time to polish the logistical aspects, not an inherent limitation.
 
 ```
 cd F:\src\github_jm
 rm -rf ncdf4.Rcheck
 ```
 
-As of July 2014, you have to install from the source package, not a tarball. 
-This is "just" a question of not having the time to polish the logistical aspects, not a limitation.
+You also need to set again NetcdfInstallPath, which is also used outside of the compilation with VC++, by Makefile.win, to copy binaries.
+
+Make sure that MSB is not set, even if we needed to do so for netcdf-c, otherwise for some reasons it makes the installation of ncdf4 fail.
+```
+set MSB=
+```
 
 ```
-set NetcdfInstallPath=F:/src/github/netcdf-c
+set NetcdfInstallPath=F:/src/github_jm/netcdf-c
 set Hdf5InstallPath=F:/bin/HDF5
 set R="c:\Program Files\R\R-3.1.0\bin\x64\R.exe"
 %R% CMD check ncdf4
 :: And/or
-%R% CMD INSTALL ncdf4
+%R% CMD build ncdf4
 ```
 
 Noticed that running one of the examples worked on 32 bits but same thing failed on 64 bits. Compiled with Visual studio then, to have a debuggable ncdf4.dll; surprise it then all works.
@@ -161,14 +197,14 @@ If you are using the `devtools` package in R:
 
 ```R
 library(devtools)
-Sys.setenv(NetcdfInstallPath='F:/src/github/netcdf-c', Hdf5InstallPath='F:/bin/HDF5')
+Sys.setenv(NetcdfInstallPath='F:/src/github_jm/netcdf-c', Hdf5InstallPath='F:/bin/HDF5')
 document('f:/src/github_jm/ncdf4', roclets = c("collate", "rd")) # leave "namespace" and "rd" out of the roclets options.
 build('f:/src/github_jm/ncdf4')
 ```
 
 ```
 cd F:\src\github_jm
-set NetcdfInstallPath=F:/src/github/netcdf-c
+set NetcdfInstallPath=F:/src/github_jm/netcdf-c
 set Hdf5InstallPath=F:/bin/HDF5
 set R="c:\Program Files\R\R-3.1.0\bin\x64\R.exe"
 %R% CMD INSTALL ncdf4_1.12-1.tar.gz
@@ -190,7 +226,7 @@ The ncdf4 package can be compiled from a tarball with VC++ as the compiler, i.e.
 
 ```
 %R% CMD build ncdf4
-set NetcdfInstallPath=F:/src/github/netcdf-c
+set NetcdfInstallPath=F:/src/github_jm/netcdf-c
 set Hdf5InstallPath=F:/bin/HDF5
 %R% CMD check ncdf4_1.10.tar.gz
 %R% CMD INSTALL --no-test-load ncdf4_1.10.tar.gz
