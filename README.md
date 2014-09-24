@@ -129,15 +129,16 @@ So a few steps are required to copy enough to have something that resembles the 
 
 ```cmd
 set CP_CMD=xcopy /Y
-
-set CPU_ARCH=x64
-
+set CPU_ARCH=x86
 %CP_CMD% %BUILD_DIR%%CPU_ARCH%\liblib\%BuildConfiguration%\netcdf.pdb %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
 %CP_CMD% %BUILD_DIR%%CPU_ARCH%\liblib\%BuildConfiguration%\netcdf.lib %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
 %CP_CMD% %HDF5_BIN_DIR_DOS%%CPU_ARCH%\bin\*.* %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
+```
 
-set CPU_ARCH=x86
+While the following excerpt copies the 64 bits binaries, do note that at the time of writing the package does not work on 64 bits due to an [access violation issue](https://github.com/jmp75/ncdf4/issues/1)
 
+```cmd
+set CPU_ARCH=x64
 %CP_CMD% %BUILD_DIR%%CPU_ARCH%\liblib\%BuildConfiguration%\netcdf.pdb %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
 %CP_CMD% %BUILD_DIR%%CPU_ARCH%\liblib\%BuildConfiguration%\netcdf.lib %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
 %CP_CMD% %HDF5_BIN_DIR_DOS%%CPU_ARCH%\bin\*.* %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
