@@ -13,6 +13,16 @@ This fork/branch [jmp75/ncdf4 at devel](https://github.com/jmp75/ncdf4/tree/deve
 
 # Building
 
+## Getting precompiled netCDF
+
+You can find Windows installers of netCDF C libraries [there](http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html). The page will provide you with link to installers. If you install all the components you will have the headers and libraries to compile against for the R package **ncdf4**.
+
+If you install the precompiled netCDF binaries, you can jump straight to the section "Building ncdf4 C/C++ code with visual studio". 
+
+If you want/need to compile netCDF itself, read on the next section.
+
+## Building netCDF from source
+
 The source code of the C API of netCDF can be found [in this github repo](https://github.com/Unidata/netcdf-c). The README has a link to compile
 [netCDF with CMake on Windows](http://www.unidata.ucar.edu/software/netcdf/docs/netCDF-CMake.html). One optional requirement, 
 which is used in this documentation, is the HDF5 Libraries for netCDF4/HDF5 support. 
@@ -22,14 +32,14 @@ You should also read through [D. Pierce's notes on ncdf4 for Win64](http://cirru
 You need RTools, as appropriate for your version of R, to build the ncdf4 package. The ncdf4 Makefile.win also uses the command `cp` that comes 
 with RTools, so you need its directory in your PATH environment variable.
 
-## Installing CMake
+### Installing CMake
 
 CMake can be downloaded from [here](http://www.cmake.org/cmake/resources/software.html). As of July 2014, this is CMake version 3. 
 You may want to add cmake to your PATH environment variable. 
 
-## Installing HDF5
+### Installing HDF5
 
-### Installing HDF5 binaries
+#### Installing HDF5 binaries
 
 There is a page on [obtaining HDF5](http://www.hdfgroup.org/HDF5/release/obtain5.html) as source code or precompiled binaries. 
 Downloading the binary packages hdf5-1.8.13-win64-VS2012-shared.zip hdf5-1.8.13-win32-VS2012-shared.zip. 
@@ -37,11 +47,11 @@ Downloading the binary packages hdf5-1.8.13-win64-VS2012-shared.zip hdf5-1.8.13-
 Install the binaries in your choice of location, F:\bin\HDF5\x64 and F:\bin\HDF5\x86. hdf5-config.cmake for 64 bits is under 
 F:\bin\HDF5\x64\cmake\hdf5\hdf5-config.cmake. The location of this config file must be passed to cmake when building netcdf-c
 
-### Building HDF5 binaries
+#### Building HDF5 binaries
 
 Placeholder; not documented yet.
 
-## Building netCDF-c
+### Building netCDF-c
 
 Once you have installed or compiled HDF5, you can compile netcdf-c with HDF5 support enabled.
 
@@ -144,8 +154,7 @@ set CPU_ARCH=x64
 %CP_CMD% %HDF5_BIN_DIR_DOS%%CPU_ARCH%\bin\*.* %INSTALL_DIR_DOS%%CPU_ARCH%\bin\
 ```
 
-
-# Building ncdf4 C/C++ code with visual studio
+## Building ncdf4 C/C++ code with visual studio
 
 In order to build R packages on Windows, you need to install [RTools](http://cran.csiro.au/bin/windows/Rtools/). While GCC is not needed in our case, since we use VC++, other tools are required and/or otherwise handy.
 
@@ -160,13 +169,31 @@ cp Makefile.win.in Makefile.win
 `create_lib.cmd` creates the file Rdll.lib necessary for VC++ to know what functions are exported by R.dll. Makefile.win overrides the 
 default behavior of R i.e. to look for source files and compile each.
 
-You need to specify two locations in the file src\ncdf4.props, so that the compilation finds the right header and libraries of dependencies. 
-You should use the "short path" format, at least do so for paths otherwise with blanks in the directory names.
+You need to specify at least two locations in the file src\ncdf4.props, so that the compilation finds the right header and libraries of dependencies. 
+You should use the "short path" format, and certainly do so for paths that would have spaces in them. 
+You can check the short name of the folders with DOS commands like `dir /X "c:\Program Files\R\"` and `dir /X "c:\"`
+
+The macro named _NetcdfSrcInstallPath_ refers to the location of the source code of the netcdf-c codebase, if available. It takes precedence over precompiled binaries at locations with names _NetcdfInstallPath32_ and _NetcdfInstallPath64_
 
 ```xml
-<NetcdfInstallPath>F:/src/github_jm/netcdf-c</NetcdfInstallPath>
-<RInstallPath>C:/PROGRA~1/R/R-31~1.0</RInstallPath>
+    <RInstallPath>C:/PROGRA~1/R/R-31~1.0</RInstallPath>
+	<!-- While the order below is not what drives it, note that a valid netcdf-c build from source takes precedence over precompiled binaries.  -->
+    <NetcdfSrcInstallPath>F:/src/github_jm/netcdf-c</NetcdfSrcInstallPath>
+    <NetcdfInstallPath32>C:/bin/netCDF_32</NetcdfInstallPath32>
+    <NetcdfInstallPath64>C:/bin/netCDF_64</NetcdfInstallPath64>
 ```
+
+In Makefile.win, you probably need to manually specify the location of msbuild.exe. It can be tricky on some machines to find; you may want to use a DOS utility:
+
+```
+ifeq "$(MSB)" ""
+# TIP: To find the location of msbuild.exe you may try to use the cmd file at:
+# https://github.com/jmp75/rClr/blob/master/src/get_msbuildpath.cmd
+MSB:=C:/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe
+# MSB:=C:/PROGRA~2/MSBuild/12.0/Bin/amd64/MSBuild.exe
+endif
+```
+
 
 As of July 2014, you have to install from the source package, not a tarball. 
 This is "just" a question of not having the time to polish the logistical aspects, not an inherent limitation.
@@ -176,16 +203,20 @@ cd F:\src\github_jm
 rm -rf ncdf4.Rcheck
 ```
 
-You also need to set again NetcdfInstallPath, which is also used outside of the compilation with VC++, by Makefile.win, to copy binaries.
-
 Make sure that MSB is not set, even if we needed to do so for netcdf-c, otherwise for some reasons it makes the installation of ncdf4 fail.
+
 ```
 set MSB=
 ```
 
+You also need to set again NetcdfSrcInstallPath, which is also used outside of the compilation with VC++, by Makefile.win, to copy binaries.
+
+
 ```
-set NetcdfInstallPath=F:/src/github_jm/netcdf-c
+set NetcdfSrcInstallPath=F:/src/github_jm/netcdf-c
 set Hdf5InstallPath=F:/bin/HDF5
+set NetcdfInstallPath32=c:/bin/netCDF_32
+set NetcdfInstallPath64=c:/bin/netCDF_64
 set R="c:\Program Files\R\R-3.1.0\bin\x64\R.exe"
 %R% CMD check ncdf4
 :: And/or
@@ -198,19 +229,18 @@ If you are using the `devtools` package in R:
 
 ```R
 library(devtools)
-Sys.setenv(NetcdfInstallPath='F:/src/github_jm/netcdf-c', Hdf5InstallPath='F:/bin/HDF5')
+Sys.setenv(NetcdfSrcInstallPath='F:/src/github_jm/netcdf-c', Hdf5InstallPath='F:/bin/HDF5')
 document('f:/src/github_jm/ncdf4', roclets = c("collate", "rd")) # leave "namespace" and "rd" out of the roclets options.
 build('f:/src/github_jm/ncdf4')
 ```
 
 ```
 cd F:\src\github_jm
-set NetcdfInstallPath=F:/src/github_jm/netcdf-c
+set NetcdfSrcInstallPath=F:/src/github_jm/netcdf-c
 set Hdf5InstallPath=F:/bin/HDF5
 set R="c:\Program Files\R\R-3.1.0\bin\x64\R.exe"
 %R% CMD INSTALL ncdf4_1.12-1.tar.gz
 ```
-
 
 
 # Log Notes
@@ -227,7 +257,7 @@ The ncdf4 package can be compiled from a tarball with VC++ as the compiler, i.e.
 
 ```
 %R% CMD build ncdf4
-set NetcdfInstallPath=F:/src/github_jm/netcdf-c
+set NetcdfSrcInstallPath=F:/src/github_jm/netcdf-c
 set Hdf5InstallPath=F:/bin/HDF5
 %R% CMD check ncdf4_1.10.tar.gz
 %R% CMD INSTALL --no-test-load ncdf4_1.10.tar.gz

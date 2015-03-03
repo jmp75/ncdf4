@@ -7,7 +7,10 @@ endif
 
 SLN:= ncdf4.sln
 
+
 ifeq "$(MSB)" ""
+# TIP: To find the location of msbuild.exe you may try to use the cmd file at:
+# https://github.com/jmp75/rClr/blob/master/src/get_msbuildpath.cmd
 MSB:=C:/PROGRA~2/MSBuild/12.0/Bin/amd64/MSBuild.exe
 endif
 
@@ -39,8 +42,10 @@ all: winarch ncdf4lib
 winarch:
 	# -@echo Windows architecture "$(R_ARCH)"
 	-@echo Build configuration "$(BuildConfiguration)"
-	-@echo netCDF C library location: "$(NetcdfInstallPath)"
+	-@echo netCDF C src library location: "$(NetcdfSrcInstallPath)"
 	-@echo HDF5 library location: "$(Hdf5InstallPath)"
+	-@echo netCDF C 32 bits binaries library location: "$(NetcdfInstallPath32)"
+	-@echo netCDF C 64 bits binaries library location: "$(NetcdfInstallPath64)"
 
 ncdf4libComp: ncdf3.c ncdf2.c ncdf.c src_ncdf4.c
 	@for tgt_platform in x64 Win32; do \
@@ -60,15 +65,17 @@ ncdf4lib: ncdf4libComp instdir
 	bin_dir=$$NCDF4_BIN_DIR; \
 	NCDF4_BINS="$$bin_dir/$(FNAME).dll $$bin_dir/$(FNAME).exp $$bin_dir/$(FNAME).lib $$bin_dir/$(FNAME).pdb" ; \
 	$(CP_CMD) $$NCDF4_BINS $(INSTDIR)/libs/$$r_architecture/ ; \
-	$(CP_CMD) $(NetcdfInstallPath)/build/x64/liblib/$(BuildConfiguration)/netcdf.* $(INSTDIR)/libs/$$r_architecture/ ; \
-	$(CP_CMD) $(Hdf5InstallPath)/x64/bin/*.dll $(INSTDIR)/libs/$$r_architecture/ ;
+	if [ -e $(NetcdfSrcInstallPath) ] ; then $(CP_CMD) $(NetcdfSrcInstallPath)/build/x64/liblib/$(BuildConfiguration)/netcdf.* $(INSTDIR)/libs/$$r_architecture/ ; fi ;\
+	if [ -e $(NetcdfInstallPath64) ] ; then $(CP_CMD) $(NetcdfInstallPath64)/bin/*.dll $(INSTDIR)/libs/$$r_architecture/ ; fi ;\
+	if [ -e $(Hdf5InstallPath) ] ; then $(CP_CMD) $(Hdf5InstallPath)/x64/bin/*.dll $(INSTDIR)/libs/$$r_architecture/ ; fi ;
 	r_architecture=i386;\
 	NCDF4_BIN_DIR=./$(BuildConfiguration);\
 	bin_dir=$$NCDF4_BIN_DIR; \
 	NCDF4_BINS="$$bin_dir/$(FNAME).dll $$bin_dir/$(FNAME).exp $$bin_dir/$(FNAME).lib $$bin_dir/$(FNAME).pdb" ; \
 	$(CP_CMD) $$NCDF4_BINS $(INSTDIR)/libs/$$r_architecture/ ; \
-	$(CP_CMD) $(NetcdfInstallPath)/build/x86/liblib/$(BuildConfiguration)/netcdf.* $(INSTDIR)/libs/$$r_architecture/ ; \
-	$(CP_CMD) $(Hdf5InstallPath)/x86/bin/*.dll $(INSTDIR)/libs/$$r_architecture/ ;
+	if [ -e $(NetcdfSrcInstallPath) ] ; then $(CP_CMD) $(NetcdfSrcInstallPath)/build/x86/liblib/$(BuildConfiguration)/netcdf.* $(INSTDIR)/libs/$$r_architecture/  ; fi ; \
+	if [ -e $(NetcdfInstallPath32) ] ; then $(CP_CMD) $(NetcdfInstallPath32)/bin/*.dll $(INSTDIR)/libs/$$r_architecture/  ; fi ; \
+	if [ -e $(Hdf5InstallPath) ] ; then $(CP_CMD) $(Hdf5InstallPath)/x86/bin/*.dll $(INSTDIR)/libs/$$r_architecture/  ; fi ;
 	
 
 clean: 

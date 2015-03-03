@@ -2,14 +2,25 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <NetcdfInstallPath>F:/src/github_jm/netcdf-c</NetcdfInstallPath>
     <RInstallPath>C:/PROGRA~1/R/R-31~1.0</RInstallPath>
+	<!-- While the order below is not what drives it, note that a valid netcdf-c build from source takes precedence over precompiled binaries.  -->
+    <NetcdfSrcInstallPath>F:/src/github_jm/netcdf-c</NetcdfSrcInstallPath>
+    <NetcdfInstallPath32>C:/bin/netCDF_32</NetcdfInstallPath32>
+    <NetcdfInstallPath64>C:/bin/netCDF_64</NetcdfInstallPath64>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
   <ItemGroup>
-    <BuildMacro Include="NetcdfInstallPath">
-      <Value>$(NetcdfInstallPath)</Value>
+    <BuildMacro Include="NetcdfSrcInstallPath">
+      <Value>$(NetcdfSrcInstallPath)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="NetcdfInstallPath32">
+      <Value>$(NetcdfInstallPath32)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="NetcdfInstallPath64">
+      <Value>$(NetcdfInstallPath64)</Value>
       <EnvironmentVariable>true</EnvironmentVariable>
     </BuildMacro>
     <BuildMacro Include="RInstallPath">
