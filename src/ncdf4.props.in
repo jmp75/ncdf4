@@ -2,12 +2,11 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <RInstallPath>C:/PROGRA~1/R/R-31~1.2</RInstallPath>
+    <RInstallPath>C:/PROGRA~1/R/R-31~1.0</RInstallPath>
 	<!-- While the order below is not what drives it, note that a valid netcdf-c build from source takes precedence over precompiled binaries.  -->
-    <!-- <NetcdfSrcInstallPath>F:/src/github_jm/netcdf-c</NetcdfSrcInstallPath> -->
-    <NetcdfSrcInstallPath>F:/not/set</NetcdfSrcInstallPath>
-	<NetcdfInstallPath32>F:/bin/netCDF4.3.2/32</NetcdfInstallPath32>
-    <NetcdfInstallPath64>F:/bin/netCDF4.3.2/64</NetcdfInstallPath64>
+    <NetcdfSrcInstallPath>F:/src/github_jm/netcdf-c</NetcdfSrcInstallPath>
+    <NetcdfInstallPath32>C:/bin/netCDF_32</NetcdfInstallPath32>
+    <NetcdfInstallPath64>C:/bin/netCDF_64</NetcdfInstallPath64>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
